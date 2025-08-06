@@ -1,13 +1,13 @@
 # Voice Clone Azure App (Expo / React Native)
 
-This project is a simple **free** Android application (can be built as APK) that:
+This project is a simple **free** Android **/** Web application (can run in browser via Expo web) that:
 
 1. Lets you save your own Azure Speech credentials (Free tier F0 is enough).
 2. Lets you record or upload a voice sample (placeholder for Custom Neural Voice training).
 3. Converts any input text into speech using your custom voice (or any Azure voice) and plays / downloads the result.
 4. Supports Dark / Light theme.
 
-> NOTE: Real-time voice-cloning requires that you have **already** created and deployed a *Custom Neural Voice* in Azure Speech Studio. You must supply the **voice name** (e.g. `my-voice-neural`) in the credentials screen.
+> NOTE: Real-time voice-cloning requires that you have **already** created and deployed a *Custom Neural Voice* in Azure Speech Studio. You must supply the **voice name** (e.g. `my-voice-neural`) in the credentials screen. Voice cloning has additional usage policies & pricing, and you must comply with Microsoft’s terms of service. **We do not provide or recommend any methods to bypass these limits.**
 
 ## Quick start
 
