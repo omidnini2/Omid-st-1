@@ -1,6 +1,17 @@
 <?php
-session_start();
-require_once __DIR__ . '/../includes/db.php';
+// No authentication / DB. Use constants from config.php or config.sample.php
+if (file_exists(__DIR__ . '/../includes/config.php')) {
+    require_once __DIR__ . '/../includes/config.php';
+} else {
+    require_once __DIR__ . '/../includes/config.sample.php';
+}
+// Validate that required constants are set
+if (AZURE_KEY === 'YOUR_SUBSCRIPTION_KEY') {
+    http_response_code(500);
+    exit('Please set AZURE_KEY in config.php');
+}
+define('AZURE_ENDPOINT', 'https://' . AZURE_REGION . '.tts.speech.microsoft.com/cognitiveservices/v1');
+
 header('Access-Control-Allow-Origin: *'); // simple CORS
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -10,11 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit('Method not allowed');
 }
 
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    exit('Not authenticated');
-}
-
 $input = json_decode(file_get_contents('php://input'), true);
 $text = trim($input['text'] ?? '');
 if (!$text) {
@@ -22,20 +28,11 @@ if (!$text) {
     exit('Missing text');
 }
 
-$db = getDB();
-$stmt = $db->prepare('SELECT azure_key, azure_region, azure_voice FROM users WHERE id=:id');
-$stmt->execute([':id'=>$_SESSION['user_id']]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$user || !$user['azure_key'] || !$user['azure_region'] || !$user['azure_voice']) {
-    http_response_code(400);
-    exit('Credentials not set');
-}
+$key = AZURE_KEY;
+$region = AZURE_REGION;
+$voice = AZURE_VOICE;
 
-$key = $user['azure_key'];
-$region = $user['azure_region'];
-$voice = $user['azure_voice'];
-
-$endpoint = "https://{$region}.tts.speech.microsoft.com/cognitiveservices/v1";
+$endpoint = AZURE_ENDPOINT;
 $ssml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><speak version=\"1.0\" xml:lang=\"en-US\"><voice name=\"{$voice}\">" . htmlspecialchars($text) . "</voice></speak>";
 
 $ch = curl_init($endpoint);
